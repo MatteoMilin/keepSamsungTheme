@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Samsung Notes Style for Keep",
+  "version": "1.0.0",
+  "description": "Gives Google Keep the look of Samsung Notes.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://keep.google.com/*"
+      ],
+      "css": [
+        "theme.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "keepsamsungtheme@skuldo",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,277 @@
+/*
+ * Samsung Notes (One UI) look for Google Keep.
+ *
+ * Every rule is scoped to html[data-sn-theme], which content.js sets from
+ * Keep's own theme (light or dark): without the script, Keep is untouched.
+ *
+ * Keep's class names come from its build. They have been stable for years;
+ * if Keep renames them, only the selectors below need updating:
+ *   .PvRhvb               sidebar          [role=tab].gk6SMd  selected entry
+ *   .RfDI4d-bN97Pc        main column      .h1U9Be-xhiy4      "Take a note" bar
+ *   .gkA7Yd-sKfxWe > div  note grid        .RNfche            note card
+ *   .IZ65Hb-TBnied        card surface     .IZ65Hb-QQhtn      open note
+ */
+
+/* ------------------------------------------------------------ tokens (from Samsung Notes Desktop) */
+/* --sn-bg is repeated in content.js (BACKGROUNDS) for the app title bar. */
+
+html[data-sn-theme='light'] {
+  --sn-bg: #fcfcfc;
+  --sn-bg-2: #f6f6f6;
+  --sn-selected: #e9e9e9;
+  --sn-hover: rgba(0, 0, 0, 0.04);
+  --sn-pill: #ebebeb;
+  --sn-text: #252525;
+  --sn-text-2: #8a8a8a;
+  --sn-accent: #f4694b;
+  --sn-shadow-card: 0 1px 5px rgba(0, 0, 0, 0.09), 0 0 1.5px rgba(0, 0, 0, 0.1);
+  --sn-shadow-pop: 0 10px 32px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08);
+  --sn-scrim: rgba(0, 0, 0, 0.3);
+}
+
+html[data-sn-theme='dark'] {
+  --sn-bg: #000000;
+  --sn-bg-2: #171717;
+  --sn-selected: #2a2a2a;
+  --sn-hover: rgba(255, 255, 255, 0.05);
+  --sn-pill: #232323;
+  --sn-text: #fafafa;
+  --sn-text-2: #9b9b9b;
+  --sn-accent: #f4694b;
+  --sn-shadow-card: 0 0 0 1px #262626;
+  --sn-shadow-pop: 0 10px 32px rgba(0, 0, 0, 0.7), 0 0 0 1px #303030;
+  --sn-scrim: rgba(0, 0, 0, 0.55);
+}
+
+html[data-sn-theme] body {
+  background: var(--sn-bg) !important;
+}
+
+/* ------------------------------------------------------------ header */
+
+html[data-sn-theme] header#gb {
+  background: var(--sn-bg) !important;
+  box-shadow: none !important;
+}
+
+html[data-sn-theme] header#gb form {
+  background: var(--sn-pill) !important;
+  border-radius: 26px !important;
+}
+
+/* ------------------------------------------------------------ sidebar (One UI drawer) */
+
+html[data-sn-theme] .PvRhvb-bN97Pc {
+  background: var(--sn-bg-2) !important;
+  border-radius: 0 26px 26px 0;
+}
+
+html[data-sn-theme] .PvRhvb [role='tab'] {
+  border-radius: 14px !important;
+}
+
+html[data-sn-theme] .PvRhvb [role='tab']:hover {
+  background: var(--sn-hover) !important;
+}
+
+html[data-sn-theme] .PvRhvb [role='tab'].gk6SMd {
+  background: var(--sn-selected) !important;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ page title and note count */
+
+html[data-sn-theme] .RfDI4d-bN97Pc[data-sn-title]::before {
+  content: attr(data-sn-title) '\A' attr(data-sn-count);
+  display: block;
+  padding: 40px 16px 28px;
+  white-space: pre-line;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--sn-text-2);
+}
+
+/* The first line of the column is the title above. */
+html[data-sn-theme] .RfDI4d-bN97Pc[data-sn-title]::first-line {
+  font-size: 34px;
+  line-height: 1.5;
+  color: var(--sn-text);
+}
+
+/* ------------------------------------------------------------ "Take a note" bar */
+
+html[data-sn-theme] .h1U9Be-xhiy4 .IZ65Hb-n0tgWb,
+html[data-sn-theme] .h1U9Be-xhiy4 .IZ65Hb-TBnied {
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: var(--sn-shadow-card) !important;
+}
+
+/* ------------------------------------------------------------ note grid */
+
+html[data-sn-theme] .RfDI4d-bN97Pc,
+html[data-sn-theme] .gkA7Yd-sKfxWe {
+  width: auto !important;
+}
+
+/* Keep lays notes out as a masonry with absolute positions: a regular grid of pages instead. */
+html[data-sn-theme] .gkA7Yd-sKfxWe > div {
+  display: grid !important;
+  /* At least two columns, even in a narrow window. */
+  grid-template-columns: repeat(auto-fill, minmax(min(176px, calc(50% - 10px)), 1fr));
+  gap: 62px 20px;
+  max-width: 1200px;
+  height: auto !important;
+  margin: 0 auto;
+  padding: 16px 24px 80px;
+  box-sizing: border-box;
+}
+
+/* Drop markers used while dragging a note. */
+html[data-sn-theme] .gkA7Yd-sKfxWe > div > :not(.RNfche) {
+  position: absolute !important;
+}
+
+html[data-sn-theme] .RNfche {
+  container-type: inline-size;
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 190 / 252;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* The page: Keep's own background (note colours stay), One UI shape. */
+html[data-sn-theme] .RNfche > .IZ65Hb-TBnied {
+  position: static !important;
+  display: flex;
+  flex-direction: column;
+  height: 100% !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: var(--sn-shadow-card) !important;
+}
+
+html[data-sn-theme] .RNfche .IZ65Hb-s2gQvd {
+  position: static !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Text as a miniature of the page, fading out at the bottom. */
+html[data-sn-theme] .RNfche .IZ65Hb-qJTHM-haAclf {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden !important;
+  padding-top: 12px;
+  -webkit-mask-image: linear-gradient(#000 72%, transparent 98%);
+  mask-image: linear-gradient(#000 72%, transparent 98%);
+}
+
+html[data-sn-theme] .RNfche .IZ65Hb-qJTHM-haAclf * {
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+/* Title and date under the page. */
+html[data-sn-theme] .RNfche .IZ65Hb-r4nke-haAclf {
+  position: absolute !important;
+  top: calc(100% + 8px);
+  left: 4px;
+  right: 4px;
+}
+
+html[data-sn-theme] .RNfche .IZ65Hb-r4nke-haAclf [role='textbox'] {
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  white-space: nowrap !important;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  color: var(--sn-text) !important;
+}
+
+html[data-sn-theme] .RNfche[data-sn-date]::after {
+  content: attr(data-sn-date);
+  position: absolute;
+  top: calc(100% + 30px);
+  left: 4px;
+  right: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 12px;
+  color: var(--sn-text-2);
+  pointer-events: none;
+}
+
+html[data-sn-theme] .RNfche[data-sn-untitled]::after {
+  top: calc(100% + 8px);
+}
+
+/* The hover actions do not fit on a small page: they stay in the open note. */
+@container (max-width: 199px) {
+  html[data-sn-theme] .RNfche .IZ65Hb-INgbqf {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------ open note */
+
+html[data-sn-theme] .VIpgJd-TUo6Hb-xJ5Hnf {
+  background: var(--sn-scrim) !important;
+}
+
+html[data-sn-theme] .IZ65Hb-QQhtn,
+html[data-sn-theme] .IZ65Hb-QQhtn > .IZ65Hb-TBnied {
+  border: 0 !important;
+  border-radius: 26px !important;
+}
+
+/* A large page, centred: Keep places the editor itself over the note it opens from. */
+html[data-sn-theme] .XKSfm-L9AdLc:has(> .IZ65Hb-QQhtn) {
+  left: 50% !important;
+  top: max(24px, 7vh) !important;
+  transform: translateX(-50%) !important;
+}
+
+html[data-sn-theme] .IZ65Hb-QQhtn {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-height: calc(100vh - max(48px, 14vh)) !important;
+  box-shadow: var(--sn-shadow-pop) !important;
+}
+
+html[data-sn-theme] .IZ65Hb-QQhtn .IZ65Hb-qJTHM-haAclf {
+  min-height: min(44vh, 420px);
+}
+
+html[data-sn-theme] .IZ65Hb-QQhtn .IZ65Hb-r4nke-haAclf [role='textbox'] {
+  padding: 22px 28px 6px !important;
+  font-size: 24px !important;
+  line-height: 1.35 !important;
+}
+
+html[data-sn-theme] .IZ65Hb-QQhtn .IZ65Hb-qJTHM-haAclf [contenteditable] {
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  font-size: 17px !important;
+  line-height: 1.6 !important;
+}
+
+/* ------------------------------------------------------------ menus */
+
+html[data-sn-theme] [role='menu'] {
+  border: 0 !important;
+  border-radius: 22px !important;
+  box-shadow: var(--sn-shadow-pop) !important;
+  overflow: hidden;
+}
