@@ -79,23 +79,16 @@ html[data-sn-theme] .PvRhvb [role='tab'].gk6SMd {
   font-weight: 600;
 }
 
-/* ------------------------------------------------------------ page title and note count */
+/* ------------------------------------------------------------ page title */
 
+/* No note count: Keep only loads the notes as you scroll. */
 html[data-sn-theme] .RfDI4d-bN97Pc[data-sn-title]::before {
-  content: attr(data-sn-title) '\A' attr(data-sn-count);
+  content: attr(data-sn-title);
   display: block;
-  padding: 40px 16px 28px;
-  white-space: pre-line;
+  padding: 40px 16px 32px;
   text-align: center;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--sn-text-2);
-}
-
-/* The first line of the column is the title above. */
-html[data-sn-theme] .RfDI4d-bN97Pc[data-sn-title]::first-line {
   font-size: 34px;
-  line-height: 1.5;
+  line-height: 1.3;
   color: var(--sn-text);
 }
 
@@ -110,20 +103,34 @@ html[data-sn-theme] .h1U9Be-xhiy4 .IZ65Hb-TBnied {
 
 /* ------------------------------------------------------------ note grid */
 
+/* The column fills the space next to the sidebar (it otherwise takes the width of its content). */
+html[data-sn-theme] .RfDI4d-bN97Pc {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
 html[data-sn-theme] .RfDI4d-bN97Pc,
 html[data-sn-theme] .gkA7Yd-sKfxWe {
   width: auto !important;
 }
 
-/* Keep lays notes out as a masonry with absolute positions: a regular grid of pages instead. */
+html[data-sn-theme] .h1U9Be-xhiy4 {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/*
+ * Keep lays notes out itself, as a masonry with absolute positions: a regular
+ * grid of pages instead, in the order of Keep's layout (content.js sets each
+ * note's `order`). Rows are 16px apart like Keep's, so that its drag and drop
+ * matches the rows shown.
+ */
 html[data-sn-theme] .gkA7Yd-sKfxWe > div {
   display: grid !important;
   /* At least two columns, even in a narrow window. */
-  grid-template-columns: repeat(auto-fill, minmax(min(176px, calc(50% - 10px)), 1fr));
-  gap: 62px 20px;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, calc(50% - 8px)), 1fr));
+  gap: 16px;
   height: auto !important;
-  margin: 0 auto;
   padding: 16px 24px 80px;
   box-sizing: border-box;
 }
@@ -133,14 +140,24 @@ html[data-sn-theme] .gkA7Yd-sKfxWe > div > :not(.RNfche) {
   position: absolute !important;
 }
 
-html[data-sn-theme] .RNfche {
-  container-type: inline-size;
+html[data-sn-theme] .gkA7Yd-sKfxWe > div > .RNfche {
   position: relative !important;
   width: auto !important;
-  height: auto !important;
-  aspect-ratio: 190 / 252;
   margin: 0 !important;
   transform: none !important;
+}
+
+/* The note under the pointer while dragging: Keep adds it to <body> and moves it itself. */
+html[data-sn-theme] body > .RNfche {
+  width: var(--sn-card-width, 200px) !important;
+}
+
+/* A page with room under it for the title and date: Keep measures this height for its rows. */
+html[data-sn-theme] .RNfche {
+  container-type: inline-size;
+  height: auto !important;
+  padding-bottom: 46px !important;
+  box-sizing: border-box;
 }
 
 /* The page: Keep's own background (note colours stay), One UI shape. */
@@ -148,7 +165,8 @@ html[data-sn-theme] .RNfche > .IZ65Hb-TBnied {
   position: static !important;
   display: flex;
   flex-direction: column;
-  height: 100% !important;
+  height: auto !important;
+  aspect-ratio: 190 / 252;
   overflow: hidden !important;
   border: 0 !important;
   border-radius: 16px !important;
@@ -178,10 +196,10 @@ html[data-sn-theme] .RNfche .IZ65Hb-qJTHM-haAclf * {
   line-height: 1.45 !important;
 }
 
-/* Title and date under the page. */
+/* Title and date under the page, in the room left by padding-bottom. */
 html[data-sn-theme] .RNfche .IZ65Hb-r4nke-haAclf {
   position: absolute !important;
-  top: calc(100% + 8px);
+  top: calc(100% - 38px);
   left: 4px;
   right: 4px;
 }
@@ -202,7 +220,7 @@ html[data-sn-theme] .RNfche .IZ65Hb-r4nke-haAclf [role='textbox'] {
 html[data-sn-theme] .RNfche[data-sn-date]::after {
   content: attr(data-sn-date);
   position: absolute;
-  top: calc(100% + 30px);
+  top: calc(100% - 16px);
   left: 4px;
   right: 4px;
   overflow: hidden;
@@ -215,7 +233,7 @@ html[data-sn-theme] .RNfche[data-sn-date]::after {
 }
 
 html[data-sn-theme] .RNfche[data-sn-untitled]::after {
-  top: calc(100% + 8px);
+  top: calc(100% - 38px);
 }
 
 /* The hover actions do not fit on a small page: they stay in the open note. */

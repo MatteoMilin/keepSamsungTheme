@@ -11,6 +11,7 @@
   // if Keep renames them, update them here and in theme.css.
   const SELECTORS = {
     card: '.RNfche',
+    grid: '.gkA7Yd-sKfxWe > div',
     cardTitle: '.IZ65Hb-r4nke-haAclf [role=textbox]',
     cardDate: '.IZ65Hb-jfdpUb-fmcmS',
     main: '.RfDI4d-bN97Pc',
@@ -67,6 +68,38 @@
     setAttr(meta, 'content', BACKGROUNDS[theme]);
   }
 
+  /** Where Keep's own layout puts a card: it moves cards with transform: translate(x, y). */
+  function keepPlace(card) {
+    const m = card.style.transform.match(/translate\(\s*(-?[\d.]+)px(?:\s*,\s*(-?[\d.]+)px)?/);
+    return m ? { x: Math.round(Number(m[1])), y: Math.round(Number(m[2] ?? 0)) } : { x: 0, y: 0 };
+  }
+
+  /**
+   * Shows the cards of a grid in the order of Keep's layout. Keep reorders notes
+   * (drag and drop, new notes) by moving them, not always in the page, and
+   * moves the empty slot under the pointer while dragging: its positions are
+   * the reference. All pages have the same height, so Keep fills its rows from
+   * left to right, and sorting by (y, x) gives its order.
+   */
+  function syncOrder(grid) {
+    const cards = [...grid.children].filter((el) => el.matches(SELECTORS.card));
+    const places = new Map(cards.map((card) => [card, keepPlace(card)]));
+    cards.sort((a, b) => places.get(a).y - places.get(b).y || places.get(a).x - places.get(b).x);
+    cards.forEach((card, i) => {
+      if (card.style.order !== String(i)) card.style.order = String(i);
+    });
+  }
+
+  /** The note dragged under the pointer gets the size of the pages in the grid. */
+  let cardWidth = 0;
+  function syncCardWidth() {
+    const width = document.querySelector(`${SELECTORS.grid} > ${SELECTORS.card}`)?.offsetWidth;
+    if (width && width !== cardWidth) {
+      cardWidth = width;
+      root.style.setProperty('--sn-card-width', `${width}px`);
+    }
+  }
+
   function update() {
     scheduled = false;
     setAttr(root, 'data-sn-theme', keepTheme() ?? root.dataset.snTheme);
@@ -77,14 +110,14 @@
       const title = card.querySelector(SELECTORS.cardTitle)?.textContent.trim();
       setAttr(card, 'data-sn-untitled', title ? null : '');
     }
+    document.querySelectorAll(SELECTORS.grid).forEach(syncOrder);
+    syncCardWidth();
 
-    // Page title and note count above the grid, as in Samsung Notes.
+    // Page title above the grid, as in Samsung Notes.
     const main = document.querySelector(SELECTORS.main);
     if (main) {
       const title = document.querySelector(SELECTORS.selectedTab)?.getAttribute('aria-label') ?? null;
-      const count = main.querySelectorAll(SELECTORS.card).length;
       setAttr(main, 'data-sn-title', title);
-      setAttr(main, 'data-sn-count', title ? `${count} note${count === 1 ? '' : 's'}` : null);
     }
   }
 
@@ -95,13 +128,14 @@
     requestAnimationFrame(update);
   }
 
-  // Attributes this script writes (data-sn-*) are not observed, so it never triggers itself.
+  // Keep moves notes through their style. This script only writes a value when
+  // it changes, so its own writes end in an update that changes nothing.
   new MutationObserver(schedule).observe(root, {
     subtree: true,
     childList: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ['class', 'aria-selected'],
+    attributeFilter: ['class', 'aria-selected', 'style'],
   });
   systemDark.addEventListener('change', schedule);
   schedule();
